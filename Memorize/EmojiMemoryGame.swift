@@ -8,8 +8,9 @@
 import SwiftUI
 
 class EmojiMemoryGame: ObservableObject {
+    typealias Card = MemoryGame<String>.Card
     
-    static let themes: Array<Theme> = [
+    private static let themes: Array<Theme> = [
         Theme(name: "Vehicles",
               emojis: ["🚂", "🚃", "🚋", "🚌", "🚎", "🚐", "🚑", "🚒", "🚓", "🚕", "🚗", "🚙", "🛻", "🚚", "🚛", "🚜", "🏎️", "🏍️", "🛵", "🛺", "🚁", "🚲", "✈️", "🚀"],
               color: .solid(.blue)),
@@ -24,14 +25,14 @@ class EmojiMemoryGame: ObservableObject {
               color: .gradient(top: .blue, bottom: .purple)),
     ]
     
-    static func createMemoryGame(theme: Theme) -> MemoryGame<String> {
+    private static func createMemoryGame(theme: Theme) -> MemoryGame<String> {
         let emojis = theme.emojis.shuffled()
         return MemoryGame<String>(numberOfPairs: min(emojis.count, 8)) { pairIndex in
             emojis[pairIndex]
         }
     }
     
-    func swiftUIColor(_ color: Theme.Color) -> Color {
+    private func swiftUIColor(_ color: Theme.Color) -> Color {
         switch color {
             case .purple: return .purple
             case .blue: return .blue
@@ -51,7 +52,7 @@ class EmojiMemoryGame: ObservableObject {
     @Published private var game: MemoryGame<String>
     @Published private var theme: Theme
     
-    var cards: Array<MemoryGame<String>.Card> {
+    var cards: Array<Card> {
         return game.cards
     }
     
@@ -72,7 +73,7 @@ class EmojiMemoryGame: ObservableObject {
     
     // MARK: - Intents
     
-    func choose(_ card: MemoryGame<String>.Card) {
+    func choose(_ card: Card) {
         game.choose(card)
     }
     

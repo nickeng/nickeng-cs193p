@@ -11,10 +11,13 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
     private(set) var cards: Array<Card>
     private(set) var score: Int = 0
     
-    private var lastChoosen: Int?
+    private var lastChoosen: Int? {
+        get { cards.indices.filter({ cards[$0].isFaceUp }).oneAndOnly }
+        set { cards.indices.forEach { cards[$0].isFaceUp = ($0 == newValue) } }
+    }
     
     init(numberOfPairs: Int, createPairContent: (Int) -> CardContent) {
-        cards = Array<Card>()
+        cards = []
         for pairIndex in 0..<numberOfPairs {
             let content = createPairContent(pairIndex)
             cards.append(Card(content: content, id: pairIndex*2))
@@ -35,24 +38,26 @@ struct MemoryGame<CardContent> where CardContent: Equatable {
                 } else if cards[chosenIndex].isSeen || cards[potentialMatch].isSeen {
                     score -= 1
                 }
+                cards[chosenIndex].isFaceUp = true
                 cards[chosenIndex].isSeen = true
                 cards[potentialMatch].isSeen = true
-                lastChoosen = nil
             } else {
-                for index in cards.indices {
-                    cards[index].isFaceUp = false
-                }
                 lastChoosen = chosenIndex
             }
-            cards[chosenIndex].isFaceUp.toggle()
         }
     }
     
     struct Card: Identifiable {
-        var isFaceUp: Bool = false
-        var isMatched: Bool = false
-        var isSeen: Bool = false
-        var content: CardContent
-        var id: Int
+        var isFaceUp = false
+        var isMatched = false
+        var isSeen = false
+        let content: CardContent
+        let id: Int
+    }
+}
+
+extension Array {
+    var oneAndOnly: Element? {
+        return self.count == 1 ? self.first : nil
     }
 }

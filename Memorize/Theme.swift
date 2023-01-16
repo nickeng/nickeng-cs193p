@@ -8,9 +8,9 @@
 import Foundation
 
 struct Theme {
-    var name: String
-    var emojis: Array<String>
-    var color: Fill
+    let name: String
+    let emojis: Array<String>
+    let color: Fill
     
     
     enum Color {

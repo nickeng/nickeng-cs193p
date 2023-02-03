@@ -45,9 +45,9 @@ struct SetGame<Shape: Hashable, Color: Hashable, Number: Hashable, Shading: Hash
     mutating func select(_ card: Card) {
         if let index = cards.firstIndex(where: { $0 == card }) {
             if selected.count >= 3 {
-                // draw new cards
+                // discard match
                 if matchSelected {
-                    drawMoreCards()
+                    selected.forEach({ cards[$0].isHidden = true })
                 }
                 // deselect all
                 selected = []
@@ -94,8 +94,10 @@ struct SetGame<Shape: Hashable, Color: Hashable, Number: Hashable, Shading: Hash
     }
     
     mutating func cheat() -> Bool {
+        // discard match
         if matchSelected {
-            drawMoreCards()
+            selected.forEach({ cards[$0].isHidden = true })
+            selected = []
         }
 
         repeat {

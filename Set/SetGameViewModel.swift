@@ -22,12 +22,24 @@ class SetGameViewModel: ObservableObject {
         )
     }
     
-    var cards: Array<Card> {
+    var allCards: Array<Card> {
+        return game.cards
+    }
+    
+    var cardsInPlay: Array<Card> {
         return game.cards.prefix(game.cardsDealt).filter({ !$0.isHidden })
+    }
+    
+    var discarded: Array<Card> {
+        return game.cards.prefix(game.cardsDealt).filter({ $0.isHidden })
     }
     
     var selectedCards: Set<Card> {
         return Set(game.selected.map({ game.cards[$0] }))
+    }
+    
+    var cardsDealt: Int {
+        return game.cardsDealt
     }
     
     var canDraw: Bool {

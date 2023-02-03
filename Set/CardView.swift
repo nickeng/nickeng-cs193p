@@ -9,20 +9,29 @@ import SwiftUI
 
 struct CardView: View {
     var card: SetGameViewModel.Card
-    var isSelected: Bool
-    var isMatched: Bool
+    var isDealt: Bool = false
+    var isSelected: Bool = false
+    var isMatched: Bool = false
+    var isNotMatched: Bool = false
     var body: some View {
         ZStack {
             let shape = RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
-            let borderColor: Color = isSelected ? .yellow : .gray
-            let backgroundColor: Color = isMatched ? .yellow : .white
-            shape.fill().foregroundColor(backgroundColor).opacity(DrawingConstants.backgroundOpacity)
-            shape.strokeBorder(borderColor, lineWidth: DrawingConstants.lineWidth)
-            VStack {
-                ForEach(0..<card.number, id: \.self) { _ in
-                    cardShape.aspectRatio(3, contentMode: .fit)
+            if !isDealt {
+                shape.fill().foregroundColor(.green)
+            } else {
+                shape.fill().foregroundColor(.white)
+                if isMatched {
+                    shape.fill().foregroundColor(.yellow).opacity(DrawingConstants.backgroundOpacity)
                 }
-            }.foregroundColor(card.color).padding(10)
+                shape.strokeBorder(borderColor, lineWidth: DrawingConstants.lineWidth)
+                VStack {
+                    ForEach(0..<card.number, id: \.self) { _ in
+                        cardShape.aspectRatio(3, contentMode: .fit)
+                    }
+                }
+                .foregroundColor(card.color)
+                .padding(10)
+            }
         }
     }
     
@@ -34,7 +43,7 @@ struct CardView: View {
         }
     }
     
-    var openShape: some View {
+    private var openShape: some View {
         ZStack {
             switch card.shape {
                 case .diamond: Diamond().stroke(lineWidth: 2)
@@ -44,7 +53,7 @@ struct CardView: View {
         }
     }
     
-    var solidShape: some View {
+    private var solidShape: some View {
         ZStack {
             switch card.shape {
                 case .diamond: Diamond()
@@ -54,7 +63,7 @@ struct CardView: View {
         }
     }
     
-    var stripedShape: some View {
+    private var stripedShape: some View {
         ZStack {
             switch card.shape {
                 case .diamond:
@@ -68,6 +77,15 @@ struct CardView: View {
                     Rectangle().opacity(0.5)
             }
         }
+    }
+    
+    private var borderColor: Color {
+        if !isSelected {
+            return .gray
+        } else if isNotMatched {
+            return .red
+        }
+        return .yellow
     }
     
     private struct DrawingConstants {
@@ -86,17 +104,23 @@ struct CardView_Previews: PreviewProvider {
     static var previews: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 10) {
             ForEach(cards) { card in
-                CardView(card: card, isSelected: false, isMatched: false).aspectRatio(2/3, contentMode: .fit)
-                CardView(card: card, isSelected: true, isMatched: false).aspectRatio(2/3, contentMode: .fit)
-                CardView(card: card, isSelected: true, isMatched: true).aspectRatio(2/3, contentMode: .fit)
+                CardView(card: card, isDealt: true, isSelected: false, isMatched: false).aspectRatio(2/3, contentMode: .fit)
+                CardView(card: card, isDealt: true, isSelected: true, isMatched: false).aspectRatio(2/3, contentMode: .fit)
+                CardView(card: card, isDealt: true, isSelected: true, isMatched: true).aspectRatio(2/3, contentMode: .fit)
+            }
+            ForEach(cards) { card in
+                CardView(card: card, isDealt: false, isSelected: false, isMatched: false).aspectRatio(2/3, contentMode: .fit)
             }
             
         }.preferredColorScheme(.light)
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 10) {
             ForEach(cards) { card in
-                CardView(card: card, isSelected: false, isMatched: false).aspectRatio(2/3, contentMode: .fit)
-                CardView(card: card, isSelected: true, isMatched: false).aspectRatio(2/3, contentMode: .fit)
-                CardView(card: card, isSelected: true, isMatched: true).aspectRatio(2/3, contentMode: .fit)
+                CardView(card: card, isDealt: false, isSelected: false, isMatched: false).aspectRatio(2/3, contentMode: .fit)
+                CardView(card: card, isDealt: true, isSelected: false, isMatched: false).aspectRatio(2/3, contentMode: .fit)
+                CardView(card: card, isDealt: true, isSelected: true, isMatched: false).aspectRatio(2/3, contentMode: .fit)
+            }
+            ForEach(cards) { card in
+                CardView(card: card, isDealt: false, isSelected: false, isMatched: false).aspectRatio(2/3, contentMode: .fit)
             }
             
         }.preferredColorScheme(.dark)

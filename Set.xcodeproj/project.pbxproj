@@ -16,6 +16,10 @@
 		DA9DBC8229739B30007F39F3 /* SetGameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA9DBC8129739B30007F39F3 /* SetGameViewModel.swift */; };
 		DA9DBC842973B0FD007F39F3 /* Diamond.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA9DBC832973B0FD007F39F3 /* Diamond.swift */; };
 		DA9DBC8629749AE1007F39F3 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA9DBC8529749AE1007F39F3 /* CardView.swift */; };
+		DAC204D82990077100533842 /* StripedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC204D72990077100533842 /* StripedView.swift */; };
+		DAC204DA2990087F00533842 /* Squiggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC204D92990087F00533842 /* Squiggle.swift */; };
+		DAC204DE29906AF900533842 /* Shake.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC204DD29906AF900533842 /* Shake.swift */; };
+		DAC204E029906F1B00533842 /* Dance.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC204DF29906F1B00533842 /* Dance.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +33,10 @@
 		DA9DBC8129739B30007F39F3 /* SetGameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGameViewModel.swift; sourceTree = "<group>"; };
 		DA9DBC832973B0FD007F39F3 /* Diamond.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diamond.swift; sourceTree = "<group>"; };
 		DA9DBC8529749AE1007F39F3 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
+		DAC204D72990077100533842 /* StripedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StripedView.swift; sourceTree = "<group>"; };
+		DAC204D92990087F00533842 /* Squiggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Squiggle.swift; sourceTree = "<group>"; };
+		DAC204DD29906AF900533842 /* Shake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shake.swift; sourceTree = "<group>"; };
+		DAC204DF29906F1B00533842 /* Dance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dance.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,7 +72,11 @@
 				DA9DBC6F29730320007F39F3 /* SetApp.swift */,
 				DA9DBC7F2973039E007F39F3 /* SetGame.swift */,
 				DA9DBC7129730320007F39F3 /* SetGameView.swift */,
+				DAC204D72990077100533842 /* StripedView.swift */,
+				DAC204D92990087F00533842 /* Squiggle.swift */,
 				DA9DBC8529749AE1007F39F3 /* CardView.swift */,
+				DAC204DD29906AF900533842 /* Shake.swift */,
+				DAC204DF29906F1B00533842 /* Dance.swift */,
 				DA9DBC832973B0FD007F39F3 /* Diamond.swift */,
 				DA9DBC8129739B30007F39F3 /* SetGameViewModel.swift */,
 				DA9DBC7D2973037E007F39F3 /* AspectVGrid.swift */,
@@ -154,8 +166,12 @@
 			files = (
 				DA9DBC8629749AE1007F39F3 /* CardView.swift in Sources */,
 				DA9DBC842973B0FD007F39F3 /* Diamond.swift in Sources */,
+				DAC204D82990077100533842 /* StripedView.swift in Sources */,
+				DAC204E029906F1B00533842 /* Dance.swift in Sources */,
+				DAC204DA2990087F00533842 /* Squiggle.swift in Sources */,
 				DA9DBC7229730320007F39F3 /* SetGameView.swift in Sources */,
 				DA9DBC7029730320007F39F3 /* SetApp.swift in Sources */,
+				DAC204DE29906AF900533842 /* Shake.swift in Sources */,
 				DA9DBC802973039E007F39F3 /* SetGame.swift in Sources */,
 				DA9DBC7E2973037E007F39F3 /* AspectVGrid.swift in Sources */,
 				DA9DBC8229739B30007F39F3 /* SetGameViewModel.swift in Sources */,

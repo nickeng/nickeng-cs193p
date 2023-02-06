@@ -12,7 +12,7 @@ struct SetGameView: View {
     
     @Namespace private var dealingNamespace
     
-    @State private var dealt = Set<UUID>()
+    @State private var dealt = Set<Int>()
     
     private func deal(_ card: SetGameViewModel.Card) {
         dealt.insert(card.id)
@@ -24,7 +24,7 @@ struct SetGameView: View {
     
     private func dealAnimation(for card: SetGameViewModel.Card) -> Animation {
         var delay = 0.0
-        if let index = game.allCards.firstIndex(where: { $0.id == card.id }) {
+        if let index = game.allCards.index(matching: card) {
             delay = Double(game.cardsDealt > 12 ? index % 3 : index) * CardConstants.dealDelay
             
         }
@@ -37,15 +37,33 @@ struct SetGameView: View {
             HStack {
                 deck
                 Spacer()
-                Button("New Game") {
+                Button {
                     game.newGame()
+                    dealt = []
+                } label: {
+                    VStack {
+                        Image(systemName: "arrow.counterclockwise")
+                            .font(.largeTitle)
+                            .padding(2)
+                        Text("New Game")
+                    }
                 }
+                .foregroundColor(.gray)
                 Spacer()
-                Button("Cheat") {
+                Button {
                     withAnimation {
                         game.cheat()
                     }
-                }.disabled(!game.canCheat)
+                } label: {
+                    VStack {
+                        Image(systemName: "wand.and.stars")
+                            .font(.largeTitle)
+                            .padding(2)
+                        Text("Cheat")
+                    }
+                }
+                .foregroundColor(.gray)
+                .disabled(!game.canCheat)
                 Spacer()
                 discardPile
             }
@@ -60,7 +78,9 @@ struct SetGameView: View {
             if isInDeck(card) {
                 Color.clear
             } else {
-                CardView(card: card, isDealt: true, isSelected: game.selectedCards.contains(card), isMatched: card.isMatched, isNotMatched: (!card.isMatched && game.selectedCards.count == 3))
+                let isSelected = game.selectedCards.contains(card)
+                let isNotMatched = !card.isMatched && isSelected && game.selectedCards.count == 3
+                CardView(card: card, isDealt: true, isSelected: isSelected, isMatched: card.isMatched, isNotMatched: isNotMatched)
                     .padding(4)
                     .matchedGeometryEffect(id: card.id, in: dealingNamespace)
                     .zIndex(zIndex(of: card))
@@ -99,17 +119,16 @@ struct SetGameView: View {
     }
     
     var discardPile: some View {
-        CardDeck(items: game.discarded) { card in
+        CardDeck(items: game.discarded) { index, card in
             CardView(card: card, isDealt: true)
                 .matchedGeometryEffect(id: card.id, in: dealingNamespace)
-                .zIndex(zIndex(of: card, invert: true))
+                .zIndex(256.0+Double(index))
         }
         .frame(width: CardConstants.deckWidth, height: CardConstants.deckHeight)
     }
     
-    private func zIndex(of card: SetGameViewModel.Card, invert: Bool = false) -> Double {
-        let index = Double(game.allCards.firstIndex(where: { $0.id == card.id }) ?? 0)
-        return invert ? index : 100.0 - index
+    private func zIndex(of card: SetGameViewModel.Card) -> Double {
+        return 256.0 - Double(game.allCards.index(matching: card) ?? 0)
     }
     
     private struct CardConstants {
@@ -124,17 +143,24 @@ struct SetGameView: View {
 
 struct CardDeck<Item, ItemView>: View where ItemView: View, Item: Identifiable {
     var items: [Item]
-    var content: (Item) -> ItemView
+    var content: (Int, Item) -> ItemView
     
-    init(items: [Item], @ViewBuilder content: @escaping (Item) -> ItemView) {
+    init(items: [Item], @ViewBuilder content: @escaping (Int, Item) -> ItemView) {
         self.items = items
         self.content = content
     }
     
+    init(items: [Item], @ViewBuilder content: @escaping (Item) -> ItemView) {
+        self.items = items
+        self.content = {(_: Int, _ item: Item) in
+            content(item)
+        }
+    }
+    
     var body: some View {
         ZStack {
-            ForEach(items) { item in
-                content(item)
+            ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+                content(index, item)
             }
         }
     }

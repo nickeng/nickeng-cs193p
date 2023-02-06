@@ -16,66 +16,47 @@ struct CardView: View {
     var body: some View {
         ZStack {
             let shape = RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
-            if !isDealt {
-                shape.fill().foregroundColor(.green)
-            } else {
+            if isDealt {
                 shape.fill().foregroundColor(.white)
-                if isMatched {
-                    shape.fill().foregroundColor(.yellow).opacity(DrawingConstants.backgroundOpacity)
+                shape.strokeBorder(lineWidth: DrawingConstants.lineWidth)
+            } else {
+                shape.fill()
+            }
+            if isMatched {
+                Color.yellow.opacity(DrawingConstants.backgroundOpacity).mask(shape)
+            }
+            VStack {
+                ForEach(0..<card.number, id: \.self) { _ in
+                    shadedShape.aspectRatio(3, contentMode: .fit)
                 }
-                shape.strokeBorder(borderColor, lineWidth: DrawingConstants.lineWidth)
-                VStack {
-                    ForEach(0..<card.number, id: \.self) { _ in
-                        cardShape.aspectRatio(3, contentMode: .fit)
-                    }
-                }
-                .foregroundColor(card.color)
-                .padding(10)
             }
+            .opacity(isDealt ? 1 : 0)
+            .foregroundColor(card.color)
+            .padding(10)
         }
+        .foregroundColor(borderColor)
+        .shake(isNotMatched)
+        .dance(isMatched)
+        .animation(.linear(duration: 1), value: isMatched)
     }
     
-    @ViewBuilder var cardShape: some View {
-        switch card.shading {
-            case .open: openShape
-            case .solid: solidShape
-            case .striped: stripedShape
-        }
-    }
-    
-    private var openShape: some View {
+    @ViewBuilder var shadedShape: some View {
         ZStack {
-            switch card.shape {
-                case .diamond: Diamond().stroke(lineWidth: 2)
-                case .oval: RoundedRectangle(cornerRadius: 1000).stroke(lineWidth: 2)
-                case .squiggle: Rectangle().stroke(lineWidth: 2)
+            switch card.shading {
+            case .open: shape.stroke(lineWidth: 2)
+            case .solid: shape
+            case .striped:
+                StripedView().mask(shape)
+                shape.stroke(lineWidth: 2)
             }
         }
     }
     
-    private var solidShape: some View {
-        ZStack {
-            switch card.shape {
-                case .diamond: Diamond()
-                case .oval: RoundedRectangle(cornerRadius: 1000)
-                case .squiggle: Rectangle()
-            }
-        }
-    }
-    
-    private var stripedShape: some View {
-        ZStack {
-            switch card.shape {
-                case .diamond:
-                    Diamond().stroke(lineWidth: 2)
-                    Diamond().opacity(0.5)
-                case .oval:
-                    RoundedRectangle(cornerRadius: 1000).stroke(lineWidth: 2)
-                    RoundedRectangle(cornerRadius: 1000).opacity(0.5)
-                case .squiggle:
-                    Rectangle().stroke(lineWidth: 2)
-                    Rectangle().opacity(0.5)
-            }
+    private var shape: some Shape {
+        switch card.shape {
+            case .diamond: return AnyShape(Diamond())
+            case .oval: return AnyShape(Capsule())
+            case .squiggle: return AnyShape(Squiggle())
         }
     }
     
@@ -97,30 +78,30 @@ struct CardView: View {
 
 struct CardView_Previews: PreviewProvider {
     static let cards = [
-        SetGameViewModel.Card(shape: .diamond, color: .blue, number: 1, shading: .open),
-        SetGameViewModel.Card(shape: .oval, color: .purple, number: 2, shading: .striped),
-        SetGameViewModel.Card(shape: .squiggle, color: .orange, number: 3, shading: .solid)
+        SetGameViewModel.Card(id: 0, shape: .diamond, color: .blue, number: 1, shading: .open),
+        SetGameViewModel.Card(id: 0, shape: .oval, color: .purple, number: 2, shading: .striped),
+        SetGameViewModel.Card(id: 0, shape: .squiggle, color: .orange, number: 3, shading: .solid)
     ]
     static var previews: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 10) {
             ForEach(cards) { card in
-                CardView(card: card, isDealt: true, isSelected: false, isMatched: false).aspectRatio(2/3, contentMode: .fit)
-                CardView(card: card, isDealt: true, isSelected: true, isMatched: false).aspectRatio(2/3, contentMode: .fit)
+                CardView(card: card, isDealt: true).aspectRatio(2/3, contentMode: .fit)
+                CardView(card: card, isDealt: true, isSelected: true).aspectRatio(2/3, contentMode: .fit)
                 CardView(card: card, isDealt: true, isSelected: true, isMatched: true).aspectRatio(2/3, contentMode: .fit)
             }
             ForEach(cards) { card in
-                CardView(card: card, isDealt: false, isSelected: false, isMatched: false).aspectRatio(2/3, contentMode: .fit)
+                CardView(card: card).aspectRatio(2/3, contentMode: .fit)
             }
             
         }.preferredColorScheme(.light)
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 10) {
             ForEach(cards) { card in
-                CardView(card: card, isDealt: false, isSelected: false, isMatched: false).aspectRatio(2/3, contentMode: .fit)
-                CardView(card: card, isDealt: true, isSelected: false, isMatched: false).aspectRatio(2/3, contentMode: .fit)
-                CardView(card: card, isDealt: true, isSelected: true, isMatched: false).aspectRatio(2/3, contentMode: .fit)
+                CardView(card: card, isDealt: true).aspectRatio(2/3, contentMode: .fit)
+                CardView(card: card, isDealt: true, isSelected: true).aspectRatio(2/3, contentMode: .fit)
+                CardView(card: card, isDealt: true, isSelected: true, isMatched: true).aspectRatio(2/3, contentMode: .fit)
             }
             ForEach(cards) { card in
-                CardView(card: card, isDealt: false, isSelected: false, isMatched: false).aspectRatio(2/3, contentMode: .fit)
+                CardView(card: card).aspectRatio(2/3, contentMode: .fit)
             }
             
         }.preferredColorScheme(.dark)

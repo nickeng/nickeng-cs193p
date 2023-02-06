@@ -10,19 +10,20 @@ import Foundation
 struct SetGame<Shape: Hashable, Color: Hashable, Number: Hashable, Shading: Hashable> {
     private(set) var cards: Array<Card>
     private(set) var selected: Set<Int> = []
-    private(set) var cardsDealt = 12
-    private let initialShown = 12
+    private(set) var cardsDealt = 12 // game initially starts with 12 cards
     private var matchSelected: Bool { isMatch(indices: selected) }
     
     init(shapes: Set<Shape>, colors: Set<Color>, numbers: Set<Number>, shadings: Set<Shading>) {
         // create deck
         cards = []
+        var id = 0
         for shape in shapes {
             for color in colors {
                 for number in numbers {
                     for shading in shadings {
-                        let card = Card(shape: shape, color: color, number: number, shading: shading)
+                        let card = Card(id: id, shape: shape, color: color, number: number, shading: shading)
                         cards.append(card)
+                        id += 1
                     }
                 }
             }
@@ -31,19 +32,19 @@ struct SetGame<Shape: Hashable, Color: Hashable, Number: Hashable, Shading: Hash
     }
     
     private func isMatch(indices: any Collection<Int>) -> Bool {
-        let selectedCards = indices.map({ cards[$0] })
-        return selectedCards.count == 3 && isMatch(selectedCards[0], selectedCards[1], selectedCards[2])
+        return isMatch(indices.map({ cards[$0] }))
     }
     
-    private func isMatch(_ first: Card, _ second: Card, _ third: Card) -> Bool {
-        return [first.shape, second.shape, third.shape].allEqualOrAllUnique
-            && [first.number, second.number, third.number].allEqualOrAllUnique
-            && [first.color, second.color, third.color].allEqualOrAllUnique
-            && [first.shading, second.shading, third.shading].allEqualOrAllUnique
+    private func isMatch(_ cards: any Collection<Card>) -> Bool {
+        return cards.count == 3
+            && cards.map({ $0[keyPath: \.shape] }).allEqualOrAllUnique
+            && cards.map({ $0[keyPath: \.number] }).allEqualOrAllUnique
+            && cards.map({ $0[keyPath: \.color] }).allEqualOrAllUnique
+            && cards.map({ $0[keyPath: \.shading] }).allEqualOrAllUnique
     }
     
     mutating func select(_ card: Card) {
-        if let index = cards.firstIndex(where: { $0 == card }) {
+        if let index = cards.index(matching: card ) {
             if selected.count >= 3 {
                 // discard match
                 if matchSelected {
@@ -113,7 +114,7 @@ struct SetGame<Shape: Hashable, Color: Hashable, Number: Hashable, Shading: Hash
     }
     
     struct Card: Equatable, Identifiable, Hashable {
-        let id = UUID()
+        let id: Int
         let shape: Shape
         let color: Color
         let number: Number
@@ -129,22 +130,6 @@ struct SetGame<Shape: Hashable, Color: Hashable, Number: Hashable, Shading: Hash
                 && lhs.shading == rhs.shading
         }
     }
-    
-    struct Characteristic<Item> {
-        private var first: Item
-        private var second: Item
-        private var third: Item
-        
-        init(_ first: Item, _ second: Item, _ third: Item) {
-            self.first = first
-            self.second = second
-            self.third = third
-        }
-        
-        func asArray() -> Array<Item> {
-            return [first, second, third]
-        }
-    }
 }
 
 extension Array where Element: Hashable {
@@ -157,5 +142,11 @@ extension Array where Element: Hashable {
     }
     var allEqualOrAllUnique: Bool {
         return self.allEqual || self.allUnique
+    }
+}
+
+extension Collection where Element: Identifiable {
+    func index(matching element: Element) -> Self.Index? {
+        firstIndex(where: { $0.id == element.id })
     }
 }

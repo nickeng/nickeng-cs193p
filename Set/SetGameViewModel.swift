@@ -10,7 +10,19 @@ import SwiftUI
 class SetGameViewModel: ObservableObject {
     typealias Card = SetGame<Shape, Color, Int, Shading>.Card
 
-    @Published private var game = createSetGame()
+    @Published private var game = createSetGame() {
+        didSet {
+            // organize discard with last cards removed at the end of the array
+            game.cards.prefix(game.cardsDealt).filter({ $0.isHidden }).forEach({ card in
+                if let previousIndex = discarded.index(matching: card) {
+                    discarded[previousIndex] = card
+                } else {
+                    discarded.append(card)
+                }
+            })
+        }
+    }
+    @Published private(set) var discarded = Array<Card>()
     @Published private(set) var canCheat = true
     
     private static func createSetGame() -> SetGame<Shape, Color, Int, Shading> {
@@ -28,10 +40,6 @@ class SetGameViewModel: ObservableObject {
     
     var cardsInPlay: Array<Card> {
         return game.cards.prefix(game.cardsDealt).filter({ !$0.isHidden })
-    }
-    
-    var discarded: Array<Card> {
-        return game.cards.prefix(game.cardsDealt).filter({ $0.isHidden })
     }
     
     var selectedCards: Set<Card> {
@@ -58,6 +66,7 @@ class SetGameViewModel: ObservableObject {
     
     func newGame() {
         game = SetGameViewModel.createSetGame()
+        discarded = []
         canCheat = true
     }
     

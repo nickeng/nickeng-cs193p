@@ -20,6 +20,10 @@ extension Collection where Element: Identifiable {
     func index(matching element: Element) -> Self.Index? {
         firstIndex(where: { $0.id == element.id })
     }
+    
+    func contains(matching element: Element) -> Bool {
+        self.index(matching: element) != nil
+    }
 }
 
 // we could do the same thing when it comes to removing an element

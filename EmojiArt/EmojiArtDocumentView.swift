@@ -48,8 +48,8 @@ struct EmojiArtDocumentView: View {
                 }
             }
             .clipped()
-            .onDrop(of: [.plainText,.url,.image], isTargeted: nil) { providers, location in
-                drop(providers: providers, at: location, in: geometry)
+            .dropDestination(for: DropItem.self) { items, location in
+                drop(items: items, at: location, in: geometry)
             }
             .gesture(panGesture().simultaneously(with: zoomGesture()))
         }
@@ -105,29 +105,29 @@ struct EmojiArtDocumentView: View {
     
     // MARK: - Drag and Drop
     
-    private func drop(providers: [NSItemProvider], at location: CGPoint, in geometry: GeometryProxy) -> Bool {
-        var found = providers.loadObjects(ofType: URL.self) { url in
+    private func drop(items: [DropItem], at location: CGPoint, in geometry: GeometryProxy) -> Bool {
+        guard let item = items.first else { return false }
+        
+        if let url = item.url {
             document.setBackground(.url(url.imageURL))
+            return true
         }
-        if !found {
-            found = providers.loadObjects(ofType: UIImage.self) { image in
-                if let data = image.jpegData(compressionQuality: 1.0) {
-                    document.setBackground(.imageData(data))
-                }
-            }
+        
+        if let image = item.image {
+            guard UIImage(data: image) != nil else { return false }
+            document.setBackground(.imageData(image))
+            return true
         }
-        if !found {
-            found = providers.loadObjects(ofType: String.self) { string in
-                if let emoji = string.first, emoji.isEmoji {
-                    document.addEmoji(
-                        String(emoji),
-                        at: convertToEmojiCoordinates(location, in: geometry),
-                        size: defaultEmojiFontSize / zoomScale
-                    )
-                }
-            }
+        
+        if let emoji = item.text?.first, emoji.isEmoji {
+            document.addEmoji(
+                String(emoji),
+                at: convertToEmojiCoordinates(location, in: geometry),
+                size: defaultEmojiFontSize / zoomScale
+            )
+            return true
         }
-        return found
+        return false
     }
     
     // MARK: - Positioning/Sizing Emoji
@@ -185,12 +185,12 @@ struct EmojiArtDocumentView: View {
                 gestureZoomScale = latestGestureScale
             }
             .onEnded { gestureScaleAtEnd in
-                if selected.isEmpty {
-                    steadyStateZoomScale *= gestureScaleAtEnd
-                } else {
+                if !selected.isEmpty {
                     for emoji in selected {
                         document.scaleEmoji(emoji, by: gestureScaleAtEnd)
                     }
+                } else {
+                    steadyStateZoomScale *= gestureScaleAtEnd
                 }
             }
     }

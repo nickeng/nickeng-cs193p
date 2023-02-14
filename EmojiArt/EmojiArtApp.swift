@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-@main
+@main @MainActor
 struct EmojiArtApp: App {
     let document = EmojiArtDocument()
     

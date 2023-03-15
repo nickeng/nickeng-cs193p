@@ -7,18 +7,28 @@
 
 import Foundation
 
-struct Theme {
-    let name: String
-    let emojis: Array<String>
-    let color: Fill
+struct Theme: Identifiable, Codable, Hashable {
+    let id: Int
+    var name: String
+    var emojis: Array<String>
+    var cards: Int
+    var fill: Fill
     
-    
-    enum Color {
-        case purple, blue, green, yellow, orange, red
+    var isValid: Bool {
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && emojis.count >= Theme.MinCards
     }
     
-    enum Fill {
-        case solid(_ color: Color)
-        case gradient(top: Color, bottom: Color)
+    enum Fill: Codable, Equatable, Hashable {
+        case solid(_ color: RGBAColor)
+        case gradient(top: RGBAColor, bottom: RGBAColor)
     }
+    
+    static var MinCards = 2
+}
+
+struct RGBAColor: Codable, Equatable, Hashable {
+    let red: Double
+    let green: Double
+    let blue: Double
+    let alpha: Double
 }
